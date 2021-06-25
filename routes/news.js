@@ -1,9 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const News = require('../models/news');
 
 /* GET news page. */
 router.get('/', (req, res) => {
-  res.render('news', { title: 'News' });
+  const search = req.query.search || '';
+
+  const news = News
+    .find({title: new RegExp(search.trim(), 'i')})
+    .sort({created: -1});
+
+  news.exec((err, data) => {
+    res.render('news', { title: 'News', data, search });
+  });
 });
 
 module.exports = router;
